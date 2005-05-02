@@ -3,22 +3,19 @@
  *
  * @APPLE_LICENSE_HEADER_START@
  * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
+ * The contents of this file constitute Original Code as defined in and
+ * are subject to the Apple Public Source License Version 2.0 (the
+ * "License").  You may not use this file except in compliance with the
+ * License.  Please obtain a copy of the License at
+ * http://www.apple.com/publicsource and read it before using this file.
  * 
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this
- * file.
- * 
- * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * This Original Code and all software distributed under the License are
+ * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
  * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
+ * FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT.  Please see the
+ * License for the specific language governing rights and limitations
+ * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
@@ -55,7 +52,7 @@ long ThinFatFile(void **binary, unsigned long *length)
     nfat = fhp->nfat_arch;
     swapped = 0;
   } else if (fhp->magic == FAT_CIGAM) {
-    nfat = NXSwapInt(fhp->nfat_arch);
+    nfat = OSSwapInt32(fhp->nfat_arch);
     swapped = 1;
   } else {
     return -1;
@@ -63,9 +60,9 @@ long ThinFatFile(void **binary, unsigned long *length)
   
   for (; nfat > 0; nfat--, fap++) {
     if (swapped) {
-      fap->cputype = NXSwapInt(fap->cputype);
-      fap->offset = NXSwapInt(fap->offset);
-      fap->size = NXSwapInt(fap->size);
+      fap->cputype = OSSwapInt32(fap->cputype);
+      fap->offset = OSSwapInt32(fap->offset);
+      fap->size = OSSwapInt32(fap->size);
     }
     
     if (fap->cputype == CPU_TYPE_I386) {
@@ -102,7 +99,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
      return -1;
   }
   
-#if NOTDEF
+#if DEBUG
   printf("magic:      %x\n", (unsigned)mH->magic);
   printf("cputype:    %x\n", (unsigned)mH->cputype);
   printf("cpusubtype: %x\n", (unsigned)mH->cpusubtype);
@@ -125,7 +122,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
       
     case LC_SEGMENT:
       ret = DecodeSegment(cmdBase, &load_addr, &load_size);
-      if (ret == 0 && load_size != 0) {
+      if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR) {
           vmaddr = min(vmaddr, load_addr);
           vmend = max(vmend, load_addr + load_size);
       }
@@ -176,15 +173,17 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
       return 0;
   }
   
-#if NOTDEF
+#if DEBUG
   printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
 	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
          (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
   getc();
 #endif
   
-  if (vmaddr < KERNEL_ADDR ||
-      (vmaddr + vmsize) > (KERNEL_ADDR + KERNEL_LEN)) {
+  if (! ((vmaddr >= KERNEL_ADDR &&
+          (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
+         (vmaddr >= HIB_ADDR &&
+          (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
       stop("Kernel overflows available space");
   }
 

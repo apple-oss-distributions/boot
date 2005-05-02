@@ -1,24 +1,23 @@
 /*
- * Copyright (c) 1999 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
  * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
- * 
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this
- * file.
+ * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
+ * Reserved.  This file contains Original Code and/or Modifications of
+ * Original Code as defined in and that are subject to the Apple Public
+ * Source License Version 2.0 (the "License").  You may not use this file
+ * except in compliance with the License.  Please obtain a copy of the
+ * License at http://www.apple.com/publicsource and read it before using
+ * this file.
  * 
  * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
  * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
+ * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
+ * License for the specific language governing rights and limitations
+ * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
@@ -32,6 +31,24 @@
 /*
  * HISTORY
  * $Log: asm.s,v $
+ * Revision 1.7  2004/05/13 17:58:38  curtisg
+ * Integrating:
+ * <rdar://problem/3094680>: (Silent boot)
+ * <rdar://problem/3363893>: (5 sec boot timeout is too short)
+ * <rdar://problem/3533781>: (Boot option to display graphics modes)
+ * <rdar://problem/3545539>: (Default graphics mode should be 32-bit)
+ * <rdar://problem/3643065>: (Booter should always find a video mode)
+ * <rdar://problem/3643815>: (Booter displays "0MB" VRAM)
+ *
+ * Revision 1.6  2003/11/05 20:51:02  curtisg
+ * Integrated 3069695,3331770,3370488,3371823
+ *
+ * Revision 1.5.26.1  2003/10/27 23:57:59  curtisg
+ * Added printing of volume names, better handling of extended
+ * partitions, and updated Apple license strings.
+ * New chain booter should work better with foreign operating
+ * systems.
+ *
  * Revision 1.5  2002/11/05 20:34:26  jliu
  * Integrating:
  * 3051234 boot shouldnt require Graphics = Yes
@@ -397,7 +414,7 @@ LABEL(_loader)
     leave
     ret
 
-#if 0
+#if UNUSED
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // pcpy(src, dst, cnt)
 //  where src is a virtual address and dst is a physical address

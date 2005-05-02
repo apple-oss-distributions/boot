@@ -3,27 +3,27 @@
  *
  * @APPLE_LICENSE_HEADER_START@
  * 
- * Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
- * 
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this
- * file.
+ * Portions Copyright (c) 1999 Apple Computer, Inc.  All Rights
+ * Reserved.  This file contains Original Code and/or Modifications of
+ * Original Code as defined in and that are subject to the Apple Public
+ * Source License Version 1.1 (the "License").  You may not use this file
+ * except in compliance with the License.  Please obtain a copy of the
+ * License at http://www.apple.com/publicsource and read it before using
+ * this file.
  * 
  * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
+ * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
  * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
+ * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
+ * License for the specific language governing rights and limitations
+ * under the License.
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
 /* test standalone library */
 #include <stdarg.h>
+#include "libsa.h"
 
 #define TEST_RESULT "The quick brown #5 fox did fine.\n"
 #define TEST_FMT "The quick %s #%d fox did fine.\n"
@@ -46,6 +46,17 @@ va_list ap)
 					   sa_rld_error_buf_size,
 					   format, ap);
 }
+
+int printf(const char * fmt, ...)
+{
+    extern void putchar(int);
+    va_list ap;
+    va_start(ap, fmt);
+    prf(fmt, ap, putchar, 0);
+    va_end(ap);
+    return 0;
+}
+
 /*
  * Print the error message and set the 'error' indication.
  */
@@ -66,10 +77,11 @@ const char *format,
 //	errors = 1;
 }
 
-main()
+int
+main(int argc, char **argv)
 {
     char buf[1024];
-    int args[4], ret;
+    int ret;
     
     printf("Testing standalone library\n");
     printf("The following two lines should be identical:\n");
@@ -108,4 +120,6 @@ main()
     printf("printf(\"Test: %% 8d\\n\",-9);\n");
     printf("Test:       -9\n");
     printf("Test: % 8d\n",-9);
+
+    return 0;
 }
